@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
+
 import { AppService } from './app.service';
 import { DrizzleModule } from './drizzle/drizzle.module';
 import { RolesModule } from './roles/roles.module';
@@ -19,7 +19,7 @@ import { AutenticacionModule } from './autenticacion/autenticacion.module';
     ExpedientesModule,
     AutenticacionModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}

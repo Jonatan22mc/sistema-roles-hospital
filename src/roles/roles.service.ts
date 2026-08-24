@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { and, eq, ilike, isNull, ne } from 'drizzle-orm';
 import { DrizzleService } from '../drizzle/drizzle.service';
 import { roles, Rol } from '../drizzle/schema/roles';
+import { usuarios } from '../drizzle/schema/usuarios';
 import { CreateRolDto } from './dto/create-rol.dto';
 import { UpdateRolDto } from './dto/update-rol.dto';
 import { QueryRolDto } from './dto/query-rol.dto';
@@ -104,6 +105,18 @@ export class RolesService {
 
   async remove(id: string): Promise<Rol> {
     await this.findOne(id);
+
+    const [usuarioActivoAsociado] = await this.drizzleService.db
+      .select()
+      .from(usuarios)
+      .where(and(eq(usuarios.rolId, id), isNull(usuarios.deletedAt)))
+      .limit(1);
+
+    if (usuarioActivoAsociado) {
+      throw new ConflictException(
+        'No se puede dar de baja el rol porque tiene usuarios activos asignados',
+      );
+    }
 
     const [rolEliminado] = await this.drizzleService.db
       .update(roles)

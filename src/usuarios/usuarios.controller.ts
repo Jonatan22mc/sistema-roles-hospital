@@ -119,6 +119,11 @@ export class UsuariosController {
     status: 404,
     description: 'El usuario especificado no existe o fue dado de baja',
   })
+  @ApiResponse({
+    status: 409,
+    description:
+      'No se puede dar de baja al usuario porque cuenta con expedientes clínicos activos registrados',
+  })
   async remove(@Param('id', parseUUIDPipe) id: string) {
     const datos = await this.usuariosService.remove(id);
     return {

@@ -4,6 +4,7 @@ import { and, eq, ilike, isNull, ne } from 'drizzle-orm';
 import { DrizzleService } from '../drizzle/drizzle.service';
 import { usuarios, Usuario } from '../drizzle/schema/usuarios';
 import { roles } from '../drizzle/schema/roles';
+import { expedientes } from '../drizzle/schema/expedientes';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { QueryUsuarioDto } from './dto/query-usuario.dto';
@@ -220,6 +221,18 @@ export class UsuariosService {
 
   async remove(id: string): Promise<UsuarioSinPassword> {
     await this.findOne(id);
+
+    const [expedienteActivoAsociado] = await this.drizzleService.db
+      .select()
+      .from(expedientes)
+      .where(and(eq(expedientes.medicoId, id), isNull(expedientes.deletedAt)))
+      .limit(1);
+
+    if (expedienteActivoAsociado) {
+      throw new ConflictException(
+        'No se puede dar de baja al usuario porque cuenta con expedientes clínicos activos registrados',
+      );
+    }
 
     const [usuarioEliminado] = await this.drizzleService.db
       .update(usuarios)

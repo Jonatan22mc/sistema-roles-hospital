@@ -113,6 +113,11 @@ export class RolesController {
     status: 404,
     description: 'El rol especificado no existe o fue dado de baja',
   })
+  @ApiResponse({
+    status: 409,
+    description:
+      'No se puede dar de baja el rol porque tiene usuarios activos asignados',
+  })
   async remove(@Param('id', parseUUIDPipe) id: string) {
     const datos = await this.rolesService.remove(id);
     return {
