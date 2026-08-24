@@ -5,5 +5,6 @@ import { ExpedientesController } from './expedientes.controller';
 @Module({
   controllers: [ExpedientesController],
   providers: [ExpedientesService],
+  exports: [ExpedientesService],
 })
 export class ExpedientesModule {}
