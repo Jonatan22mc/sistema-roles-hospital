@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DrizzleModule } from './drizzle/drizzle.module';
 import { RolesModule } from './roles/roles.module';
 import { PermisosModule } from './permisos/permisos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
@@ -9,7 +10,15 @@ import { ExpedientesModule } from './expedientes/expedientes.module';
 import { AutenticacionModule } from './autenticacion/autenticacion.module';
 
 @Module({
-  imports: [RolesModule, PermisosModule, UsuariosModule, PerfilesModule, ExpedientesModule, AutenticacionModule],
+  imports: [
+    DrizzleModule,
+    RolesModule,
+    PermisosModule,
+    UsuariosModule,
+    PerfilesModule,
+    ExpedientesModule,
+    AutenticacionModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

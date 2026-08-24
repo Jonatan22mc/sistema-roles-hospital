@@ -1,26 +1,61 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAutenticacionDto } from './dto/create-autenticacion.dto';
-import { UpdateAutenticacionDto } from './dto/update-autenticacion.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { and, eq, isNull } from 'drizzle-orm';
+import { DrizzleService } from '../drizzle/drizzle.service';
+import { usuarios } from '../drizzle/schema/usuarios';
+import { perfiles } from '../drizzle/schema/perfiles';
+import { LoginAutenticacionDto } from './dto/login-autenticacion.dto';
 
 @Injectable()
 export class AutenticacionService {
-  create(createAutenticacionDto: CreateAutenticacionDto) {
-    return 'This action adds a new autenticacion';
-  }
+  constructor(private readonly drizzleService: DrizzleService) {}
 
-  findAll() {
-    return `This action returns all autenticacion`;
-  }
+  async iniciarSesion(loginAutenticacionDto: LoginAutenticacionDto) {
+    const emailNormalizado = loginAutenticacionDto.email.trim().toLowerCase();
 
-  findOne(id: number) {
-    return `This action returns a #${id} autenticacion`;
-  }
+    const [usuario] = await this.drizzleService.db
+      .select()
+      .from(usuarios)
+      .where(
+        and(
+          eq(usuarios.email, emailNormalizado),
+          isNull(usuarios.deletedAt),
+          eq(usuarios.activo, true),
+        ),
+      )
+      .limit(1);
 
-  update(id: number, updateAutenticacionDto: UpdateAutenticacionDto) {
-    return `This action updates a #${id} autenticacion`;
-  }
+    if (!usuario) {
+      throw new UnauthorizedException(
+        'Credenciales incorrectas o usuario inactivo',
+      );
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} autenticacion`;
+    const passwordValida = await bcrypt.compare(
+      loginAutenticacionDto.password,
+      usuario.password,
+    );
+
+    if (!passwordValida) {
+      throw new UnauthorizedException(
+        'Credenciales incorrectas o usuario inactivo',
+      );
+    }
+
+    const [perfil] = await this.drizzleService.db
+      .select()
+      .from(perfiles)
+      .where(eq(perfiles.usuarioId, usuario.id))
+      .limit(1);
+
+    return {
+      usuario: {
+        id: usuario.id,
+        email: usuario.email,
+        rolId: usuario.rolId,
+        activo: usuario.activo,
+      },
+      perfil: perfil || null,
+    };
   }
 }

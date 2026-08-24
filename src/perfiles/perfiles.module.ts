@@ -5,5 +5,6 @@ import { PerfilesController } from './perfiles.controller';
 @Module({
   controllers: [PerfilesController],
   providers: [PerfilesService],
+  exports: [PerfilesService],
 })
 export class PerfilesModule {}
