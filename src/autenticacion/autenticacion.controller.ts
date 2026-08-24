@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AutenticacionService } from './autenticacion.service';
 import { LoginAutenticacionDto } from './dto/login-autenticacion.dto';
@@ -12,7 +6,7 @@ import { LoginAutenticacionDto } from './dto/login-autenticacion.dto';
 @ApiTags('Autenticación')
 @Controller('autenticacion')
 export class AutenticacionController {
-  constructor(private readonly autenticacionService: AutenticacionService) {}
+  constructor(private readonly autenticacionService: AutenticacionService) { }
 
   @Post('iniciar-sesion')
   @HttpCode(HttpStatus.OK)
